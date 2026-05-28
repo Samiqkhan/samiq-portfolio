@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useRef } from "react";
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, easeOut } from "framer-motion";
 
 // --- INLINE SVG ICONS ---
 // Replaced lucide-react for better performance and fewer dependencies.
@@ -111,7 +111,35 @@ const FloatingElements = () => (
 );
 
 // --- SKILLS DATA & STYLES ---
-const skillCategories = [
+
+const colorStyles = {
+  blue: {
+    bg: "bg-blue-500",
+    shadow: "shadow-blue-500/50",
+    text: "text-blue-300",
+  },
+  purple: {
+    bg: "bg-purple-500",
+    shadow: "shadow-purple-500/50",
+    text: "text-purple-300",
+  },
+  orange: {
+    bg: "bg-orange-500",
+    shadow: "shadow-orange-500/50",
+    text: "text-orange-300",
+  },
+} as const;
+
+type ColorKey = keyof typeof colorStyles;
+
+interface SkillCategory {
+  title: string;
+  icon: React.ReactNode;
+  color: ColorKey;
+  skills: string[];
+}
+
+const skillCategories: SkillCategory[] = [
   {
     title: "Technical Languages",
     icon: <CodeIcon />,
@@ -139,49 +167,31 @@ const skillCategories = [
   },
 ];
 
-const colorStyles = {
-  blue: {
-    bg: "bg-blue-500",
-    shadow: "shadow-blue-500/50",
-    text: "text-blue-300",
-  },
-  purple: {
-    bg: "bg-purple-500",
-    shadow: "shadow-purple-500/50",
-    text: "text-purple-300",
-  },
-  orange: {
-    bg: "bg-orange-500",
-    shadow: "shadow-orange-500/50",
-    text: "text-orange-300",
+// --- SKILL TIMELINE ITEM COMPONENT ---
+const cardVariants = {
+  hidden: { opacity: 0, x: 50 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, ease: easeOut },
   },
 };
 
-// --- SKILL TIMELINE ITEM COMPONENT ---
+const dotVariants = {
+  hidden: { scale: 0 },
+  visible: { scale: 1, transition: { duration: 0.5, delay: 0.2 } },
+};
+
 const SkillTimelineItem = ({
   category,
   isLast,
 }: {
-  category: (typeof skillCategories)[0];
+  category: SkillCategory;
   isLast: boolean;
 }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.5 });
-  const styles = colorStyles[category.color] || {};
-
-  const cardVariants = {
-    hidden: { opacity: 0, x: 50 },
-    visible: {
-      opacity: 1,
-      x: 0,
-      transition: { duration: 0.6, ease: "easeOut" },
-    },
-  };
-
-  const dotVariants = {
-    hidden: { scale: 0 },
-    visible: { scale: 1, transition: { duration: 0.5, delay: 0.2 } },
-  };
+  const styles = colorStyles[category.color];
 
   return (
     <div ref={ref} className="relative pl-20">
